@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Match Predictor</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 30px; max-width: 720px; margin: auto; }
+    select, button { padding: 8px 12px; margin-top: 8px; width: 100%; }
+    .row { display:flex; gap: 12px; }
+    .col { flex: 1; }
+    .card { border: 1px solid #ddd; padding: 16px; margin-top: 18px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h2>Premier League Match Predictor</h2>
+
+  <div class="card">
+    <div class="row">
+      <div class="col">
+        <label>Home Team</label>
+        <select id="home_team">
+          {% for t in teams %}
+            <option value="{{ t }}">{{ t }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col">
+        <label>Away Team</label>
+        <select id="away_team">
+          {% for t in teams %}
+            <option value="{{ t }}">{{ t }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <button id="btnPredict">Predict</button>
+
+    <div id="result" class="card" style="display:none"></div>
+  </div>
+
+<script>
+document.getElementById('btnPredict').addEventListener('click', function(){
+  const home = document.getElementById('home_team').value;
+  const away = document.getElementById('away_team').value;
+
+  const formData = new FormData();
+  formData.append('home_team', home);
+  formData.append('away_team', away);
+
+  fetch('/predict', { method: 'POST', body: formData })
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('result').style.display = 'block';
+      document.getElementById('result').innerHTML = `
+        <h3>Prediction</h3>
+        <b>RandomForest:</b> ${data.RandomForest} <br>
+        <b>XGBoost:</b> ${data.XGBoost} <br>
+        <b>KNN:</b> ${data.KNN} <br>
+        <b>RF_score:</b> ${data.RF_score} <br>
+        <b>XGB_score:</b> ${data.XGB_score} <br>
+        <b>Ensemble_score:</b> ${data.Ensemble_score}
+      `;
+    });
+});
+</script>
+</body>
+</html>
