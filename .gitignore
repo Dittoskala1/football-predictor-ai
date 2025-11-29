@@ -1,6 +1,19 @@
-# ignore venv
+# Ignore virtual environment
 venv/
 
-# python cache
+# Python cache
 __pycache__/
 *.pyc
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Model weights / ML artifacts (biasanya file besar)
+*.pkl
+*.h5
+*.pt
+*.onnx
+*.joblib
+
+# OS files (macOS)
+.DS_Store
