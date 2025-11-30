@@ -1,68 +1,178 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Match Predictor</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 30px; max-width: 720px; margin: auto; }
-    select, button { padding: 8px 12px; margin-top: 8px; width: 100%; }
-    .row { display:flex; gap: 12px; }
-    .col { flex: 1; }
-    .card { border: 1px solid #ddd; padding: 16px; margin-top: 18px; border-radius: 8px; }
-  </style>
+<meta charset="UTF-8">
+<title>Premier League Match Predictor</title>
+
+<style>
+    body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: #e9eef5;
+        padding: 40px;
+        max-width: 900px;
+        margin: auto;
+    }
+
+    h2 {
+        text-align: center;
+        font-size: 32px;
+        margin-bottom: 20px;
+        color: #222;
+    }
+
+    .card {
+        background: white;
+        padding: 25px;
+        border-radius: 14px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+        margin-top: 20px;
+    }
+
+    select, button {
+        padding: 12px;
+        width: 100%;
+        font-size: 16px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        margin-top: 10px;
+    }
+
+    button {
+        background: #007bff;
+        color: white;
+        border: none;
+        font-size: 18px;
+        margin-top: 18px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    button:hover {
+        background: #0056d4;
+    }
+
+    .result-box {
+        margin-top: 20px;
+        padding: 20px;
+        border-radius: 12px;
+        background: #fafbfd;
+        border-left: 5px solid #007bff;
+    }
+
+    .section-title {
+        font-size: 20px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    .winner-box {
+        margin-top: 18px;
+        background: #007bff;
+        color: white;
+        padding: 18px;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+
+    .score-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 10px;
+    }
+
+    .score-card {
+        background: #ffffff;
+        padding: 13px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+</style>
 </head>
+
 <body>
-  <h2>Premier League Match Predictor</h2>
 
-  <div class="card">
-    <div class="row">
-      <div class="col">
-        <label>Home Team</label>
-        <select id="home_team">
-          {% for t in teams %}
-            <option value="{{ t }}">{{ t }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col">
-        <label>Away Team</label>
-        <select id="away_team">
-          {% for t in teams %}
-            <option value="{{ t }}">{{ t }}</option>
-          {% endfor %}
-        </select>
-      </div>
-    </div>
+<h2>⚽ Premier League Match Predictor</h2>
 
-    <button id="btnPredict">Predict</button>
+<div class="card">
+    <label><b>Home Team</b></label>
+    <select id="home_team">
+        {% for t in teams %}
+        <option value="{{ t }}">{{ t }}</option>
+        {% endfor %}
+    </select>
 
-    <div id="result" class="card" style="display:none"></div>
-  </div>
+    <label style="margin-top:15px;"><b>Away Team</b></label>
+    <select id="away_team">
+        {% for t in teams %}
+        <option value="{{ t }}">{{ t }}</option>
+        {% endfor %}
+    </select>
+
+    <button id="btnPredict">Predict Match</button>
+
+    <div id="result" style="display:none;"></div>
+</div>
 
 <script>
-document.getElementById('btnPredict').addEventListener('click', function(){
-  const home = document.getElementById('home_team').value;
-  const away = document.getElementById('away_team').value;
+document.getElementById("btnPredict").addEventListener("click", () => {
+    const home = document.getElementById("home_team").value;
+    const away = document.getElementById("away_team").value;
 
-  const formData = new FormData();
-  formData.append('home_team', home);
-  formData.append('away_team', away);
+    if (home === away) {
+        alert("Home dan Away tidak boleh sama!");
+        return;
+    }
 
-  fetch('/predict', { method: 'POST', body: formData })
-    .then(r => r.json())
-    .then(data => {
-      document.getElementById('result').style.display = 'block';
-      document.getElementById('result').innerHTML = `
-        <h3>Prediction</h3>
-        <b>RandomForest:</b> ${data.RandomForest} <br>
-        <b>XGBoost:</b> ${data.XGBoost} <br>
-        <b>KNN:</b> ${data.KNN} <br>
-        <b>RF_score:</b> ${data.RF_score} <br>
-        <b>XGB_score:</b> ${data.XGB_score} <br>
-        <b>Ensemble_score:</b> ${data.Ensemble_score}
-      `;
-    });
+    const formData = new FormData();
+    formData.append("home_team", home);
+    formData.append("away_team", away);
+
+    fetch("/predict", { method: "POST", body: formData })
+        .then(response => response.json())
+        .then(data => {
+
+            const res = document.getElementById("result");
+            res.style.display = "block";
+
+            // translate H/A/D jadi tulisan
+            function fullResult(x) {
+                if (x === "H") return "Home Win";
+                if (x === "A") return "Away Win";
+                return "Draw";
+            }
+
+            res.innerHTML = `
+                <div class="result-box">
+                    <div class="section-title">🔍 Model Predictions</div>
+                    <p><b>Random Forest:</b> ${fullResult(data.RandomForest)}</p>
+                    <p><b>XGBoost:</b> ${fullResult(data.XGBoost)}</p>
+                    <p><b>KNN:</b> ${fullResult(data.KNN)}</p>
+
+                    <div class="section-title" style="margin-top:20px;">📊 Prediksi Skor</div>
+                    <div class="score-grid">
+                        <div class="score-card"><b>RF Score:</b><br>${data.RF_score}</div>
+                        <div class="score-card"><b>XGB Score:</b><br>${data.XGB_score}</div>
+                    </div>
+
+                    <div class="score-card" style="margin-top:15px; text-align:center;">
+                        <b>Ensemble Score:</b><br>
+                        <span style="font-size:20px;">${data.Ensemble_score}</span>
+                    </div>
+
+                    <div class="winner-box">
+                        FINAL WINNER: ${fullResult(data.Final_Winner)}
+                    </div>
+                </div>
+            `;
+        });
 });
 </script>
+
 </body>
 </html>
