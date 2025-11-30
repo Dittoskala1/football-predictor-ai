@@ -14,7 +14,7 @@ warnings.filterwarnings("ignore")
 # ============================
 # PATH
 # ============================
-CSV_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "/root/perkuliahan/AI/Project_AI/data/EnglandCSVcleanded.csv")
+CSV_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "/root/college/AI/footballpred/football-predictor-ai/data/EnglandCSVcleanded.csv")
 SAVE_DIR = os.path.join(os.path.dirname(__file__), "saved_models")
 os.makedirs(SAVE_DIR, exist_ok=True)
 

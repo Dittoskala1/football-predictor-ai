@@ -8,3 +8,5 @@ flask-cors
 matplotlib
 seaborn
 streamlit
+xgboost
+shap
